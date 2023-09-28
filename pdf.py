@@ -1,8 +1,55 @@
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 import subprocess
+import tempfile
 import os
+from PIL import Image
+
+
+def exifCorrection(image_path: str):
+    temp = "temp"
+    os.makedirs(temp, exist_ok=True)
+    # Check the Exif orientation and rotate/transpose the image if necessary
+    with Image.open(image_path) as img:
+        image = img
+        if hasattr(image, "_getexif"):
+            exif = image._getexif()
+            if exif is not None:
+                orientation = exif.get(0x0112)
+                if orientation is not None:
+                    if orientation == 1:
+                        # Normal (no rotation needed)
+                        pass
+                    elif orientation == 2:
+                        # Mirrored horizontally
+                        image = image.transpose(Image.FLIP_LEFT_RIGHT)
+                    elif orientation == 3:
+                        # Upside down
+                        image = image.rotate(180, expand=True)
+                    elif orientation == 4:
+                        # Mirrored vertically
+                        image = image.transpose(Image.FLIP_TOP_BOTTOM)
+                    elif orientation == 5:
+                        # Rotated 90 degrees counterclockwise and mirrored horizontally
+                        image = image.rotate(90, expand=True).transpose(
+                            Image.FLIP_LEFT_RIGHT)
+                    elif orientation == 6:
+                        # Rotated 90 degrees counterclockwise
+                        image = image.rotate(90, expand=True)
+                    elif orientation == 7:
+                        # Rotated 90 degrees clockwise and mirrored horizontally
+                        image = image.rotate(-90,
+                                             expand=True).transpose(Image.FLIP_LEFT_RIGHT)
+                    elif orientation == 8:
+                        # Rotated 90 degrees clockwise
+                        image = image.rotate(-90, expand=True)
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp_image:
+            tmp_image_path = tmp_image.name
+            image.save(tmp_image_path, "JPEG")
+    return tmp_image_path
+
 
 # Define the PDF filename
 pdf_filename = "output.pdf"
@@ -40,7 +87,9 @@ for filename in os.listdir(image_path):
         y += image_height+0.28333*28.35
 
     # Draw the image on the canvas
-    c.drawImage(file_path, x, page_height - y - image_height,
+    image = exifCorrection(file_path)
+
+    c.drawImage(image, x, page_height - y - image_height,
                 width=image_width, height=image_height)
     x += image_width + 0.6*28.35
     image_placed += 1
