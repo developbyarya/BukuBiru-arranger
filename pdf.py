@@ -3,7 +3,6 @@ from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 import subprocess
 import os
-import PyPDF2
 
 # Define the PDF filename
 pdf_filename = "output.pdf"
@@ -52,15 +51,4 @@ c.save()
 
 print(f"PDF file '{pdf_filename}' has been created.")
 # Compress the PDF using PyPDF2
-compressed_pdf_filename = pdf_filename + "-compressed"
-with open(pdf_filename, "rb") as original_pdf:
-    pdf_reader = PyPDF2.PdfReader(original_pdf)
-    pdf_writer = PyPDF2.PdfWriter()
-
-    for page_number in range(len(pdf_reader.pages)):
-        pdf_writer.add_page(pdf_reader.pages[page_number])
-
-    with open(compressed_pdf_filename, "wb") as compressed_pdf:
-        pdf_writer.write(compressed_pdf)
-
-subprocess.Popen(["xdg-open", compressed_pdf_filename])
+subprocess.Popen(["xdg-open", pdf_filename])

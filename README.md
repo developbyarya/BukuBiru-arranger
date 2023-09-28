@@ -55,5 +55,6 @@ python image_compress.py
 ## Note
 
 1. Semua gambar yang digunakan disarankan sudah memiliki ratio 3:4 dengan tujuan kerapian.
-2. Kecepatan eksekusi diujikan pada laptop i3-2310M CPU dengan ram 4 GB pada sistem operasi Ubuntu 22.04.3 LTS
-3. Pada 140 Foto ukurang pdf file masih dikisaran 150mb (cukup besar)
+2. Digunakan python versi 3.10
+3. Kecepatan eksekusi diujikan pada laptop i3-2310M CPU dengan ram 4 GB pada sistem operasi Ubuntu 22.04.3 LTS
+4. Pada 140 Foto ukurang pdf file masih dikisaran 150mb (cukup besar)
